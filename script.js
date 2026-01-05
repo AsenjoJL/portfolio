@@ -172,6 +172,18 @@ scrollTopBtn.addEventListener('click', () => {
 */
 
 // ============================================
+// PROFILE IMAGE ERROR HANDLING
+// ============================================
+const profileImg = document.getElementById('profileImg');
+if (profileImg) {
+    profileImg.addEventListener('error', function() {
+        console.error('Profile image failed to load. Please check the image path.');
+        // Optionally hide the profile picture container if image fails
+        // this.style.display = 'none';
+    });
+}
+
+// ============================================
 // CONSOLE MESSAGE
 // ============================================
 console.log('%c👋 Hello! Welcome to Lester Asenjo\'s Portfolio', 'color: #2563eb; font-size: 16px; font-weight: bold;');
