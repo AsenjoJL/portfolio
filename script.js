@@ -8,6 +8,7 @@ const navLinks = document.querySelectorAll('.nav-link');
 hamburger.addEventListener('click', () => {
     navMenu.classList.toggle('active');
     hamburger.classList.toggle('active');
+    document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
 });
 
 // Close mobile menu when clicking on a link
@@ -15,7 +16,17 @@ navLinks.forEach(link => {
     link.addEventListener('click', () => {
         navMenu.classList.remove('active');
         hamburger.classList.remove('active');
+        document.body.style.overflow = '';
     });
+});
+
+// Close menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+        navMenu.classList.remove('active');
+        hamburger.classList.remove('active');
+        document.body.style.overflow = '';
+    }
 });
 
 // ============================================
@@ -40,16 +51,22 @@ navLinks.forEach(link => {
 });
 
 // ============================================
-// NAVBAR BACKGROUND ON SCROLL
+// ENHANCED NAVBAR ON SCROLL
 // ============================================
 const navbar = document.querySelector('.navbar');
+let lastScroll = 0;
 
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+    const currentScroll = window.pageYOffset;
+    
+    // Add scrolled class for enhanced shadow
+    if (currentScroll > 50) {
+        navbar.classList.add('scrolled');
     } else {
-        navbar.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+        navbar.classList.remove('scrolled');
     }
+    
+    lastScroll = currentScroll;
 });
 
 // ============================================
@@ -57,13 +74,13 @@ window.addEventListener('scroll', () => {
 // ============================================
 const sections = document.querySelectorAll('section[id]');
 
-window.addEventListener('scroll', () => {
+const updateActiveLink = () => {
     const scrollY = window.pageYOffset;
     const navHeight = navbar.offsetHeight;
 
     sections.forEach(section => {
         const sectionHeight = section.offsetHeight;
-        const sectionTop = section.offsetTop - navHeight - 100;
+        const sectionTop = section.offsetTop - navHeight - 150;
         const sectionId = section.getAttribute('id');
 
         if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
@@ -75,91 +92,59 @@ window.addEventListener('scroll', () => {
             });
         }
     });
-});
+};
+
+window.addEventListener('scroll', updateActiveLink);
+window.addEventListener('load', updateActiveLink);
 
 // ============================================
-// FADE IN ANIMATION ON SCROLL
+// ENHANCED FADE IN ANIMATION ON SCROLL
 // ============================================
 const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
+    threshold: 0.15,
+    rootMargin: '0px 0px -80px 0px'
 };
 
 const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
+    entries.forEach((entry, index) => {
         if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
+            setTimeout(() => {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }, index * 100);
+            observer.unobserve(entry.target);
         }
     });
 }, observerOptions);
 
-// Observe all project cards, skill categories, and education items
+// Observe all animated elements
 document.addEventListener('DOMContentLoaded', () => {
     const animatedElements = document.querySelectorAll(
-        '.project-card, .skill-category, .education-item, .tool-item, .contact-item'
+        '.project-card, .skill-category, .education-item, .tool-item, .contact-item, .about-text'
     );
 
-    animatedElements.forEach(el => {
+    animatedElements.forEach((el, index) => {
         el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
         observer.observe(el);
     });
 });
 
 // ============================================
-// RESUME DOWNLOAD BUTTON
+// SCROLL TO TOP BUTTON
 // ============================================
-const resumeBtn = document.getElementById('resumeBtn');
-
-resumeBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    // Placeholder for resume download
-    // Replace with actual resume file path when available
-    alert('Resume download will be available soon. Please contact me for a copy.');
-});
-
-// ============================================
-// FORM VALIDATION (if contact form is added later)
-// ============================================
-// This is a placeholder for future contact form functionality
-
-// ============================================
-// SCROLL TO TOP BUTTON (Optional Enhancement)
-// ============================================
-// Uncomment below to add a scroll-to-top button
-
-/*
 const scrollTopBtn = document.createElement('button');
 scrollTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
-scrollTopBtn.className = 'scroll-top-btn';
-scrollTopBtn.style.cssText = `
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 50px;
-    height: 50px;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    z-index: 999;
-`;
-
+scrollTopBtn.className = 'scroll-top';
+scrollTopBtn.setAttribute('aria-label', 'Scroll to top');
 document.body.appendChild(scrollTopBtn);
 
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-        scrollTopBtn.style.display = 'flex';
+    if (window.scrollY > 400) {
+        scrollTopBtn.classList.add('show');
     } else {
-        scrollTopBtn.style.display = 'none';
+        scrollTopBtn.classList.remove('show');
     }
 });
 
@@ -169,7 +154,86 @@ scrollTopBtn.addEventListener('click', () => {
         behavior: 'smooth'
     });
 });
-*/
+
+// ============================================
+// ENHANCED BUTTON INTERACTIONS
+// ============================================
+const buttons = document.querySelectorAll('.btn');
+buttons.forEach(btn => {
+    btn.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-3px)';
+    });
+    
+    btn.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+    });
+});
+
+// ============================================
+// RESUME DOWNLOAD BUTTON
+// ============================================
+const resumeBtn = document.getElementById('resumeBtn');
+
+if (resumeBtn) {
+    resumeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Placeholder for resume download
+        // Replace with actual resume file path when available
+        const message = 'Resume download will be available soon. Please contact me for a copy.';
+        
+        // Create a more user-friendly notification
+        const notification = document.createElement('div');
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            max-width: 300px;
+            font-weight: 500;
+        `;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    });
+}
+
+// ============================================
+// ENHANCED PROJECT CARD INTERACTIONS
+// ============================================
+const projectCards = document.querySelectorAll('.project-card');
+projectCards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-10px) scale(1.02)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0) scale(1)';
+    });
+});
+
+// ============================================
+// SKILL ITEM INTERACTIVE EFFECTS
+// ============================================
+const skillItems = document.querySelectorAll('.skill-item');
+skillItems.forEach(item => {
+    item.addEventListener('click', function() {
+        // Add a subtle pulse effect
+        this.style.animation = 'pulse 0.3s ease';
+        setTimeout(() => {
+            this.style.animation = '';
+        }, 300);
+    });
+});
 
 // ============================================
 // PROFILE IMAGE ERROR HANDLING
@@ -178,14 +242,130 @@ const profileImg = document.getElementById('profileImg');
 if (profileImg) {
     profileImg.addEventListener('error', function() {
         console.error('Profile image failed to load. Please check the image path.');
-        // Optionally hide the profile picture container if image fails
-        // this.style.display = 'none';
+        this.style.display = 'none';
+    });
+    
+    // Add loading state
+    profileImg.addEventListener('load', function() {
+        this.style.opacity = '0';
+        this.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => {
+            this.style.opacity = '1';
+        }, 100);
     });
 }
 
 // ============================================
+// PARALLAX EFFECT FOR HERO SECTION
+// ============================================
+const hero = document.querySelector('.hero');
+if (hero) {
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const heroContent = document.querySelector('.hero-content');
+        if (heroContent && scrolled < hero.offsetHeight) {
+            heroContent.style.transform = `translateY(${scrolled * 0.5}px)`;
+            heroContent.style.opacity = 1 - (scrolled / hero.offsetHeight) * 0.5;
+        }
+    });
+}
+
+// ============================================
+// KEYBOARD NAVIGATION ENHANCEMENT
+// ============================================
+document.addEventListener('keydown', (e) => {
+    // ESC key closes mobile menu
+    if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+        navMenu.classList.remove('active');
+        hamburger.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+});
+
+// ============================================
+// ADDITIONAL ANIMATIONS
+// ============================================
+// Add CSS animations dynamically
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+`;
+document.head.appendChild(style);
+
+// ============================================
+// PERFORMANCE OPTIMIZATION
+// ============================================
+// Throttle scroll events for better performance
+let ticking = false;
+
+function onScroll() {
+    updateActiveLink();
+    
+    if (!ticking) {
+        window.requestAnimationFrame(() => {
+            // Scroll-based animations here
+            ticking = false;
+        });
+        ticking = true;
+    }
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+
+// ============================================
 // CONSOLE MESSAGE
 // ============================================
-console.log('%c👋 Hello! Welcome to Lester Asenjo\'s Portfolio', 'color: #2563eb; font-size: 16px; font-weight: bold;');
-console.log('%cInterested in my work? Let\'s connect!', 'color: #64748b; font-size: 12px;');
+console.log('%c👋 Hello! Welcome to John Lester Asenjo\'s Portfolio', 'color: #6366f1; font-size: 18px; font-weight: bold;');
+console.log('%cInterested in my work? Let\'s connect!', 'color: #64748b; font-size: 14px;');
+console.log('%cBuilt with ❤️ using HTML, CSS, and JavaScript', 'color: #8b5cf6; font-size: 12px;');
 
+// ============================================
+// LAZY LOADING FOR IMAGES (if needed)
+// ============================================
+if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                if (img.dataset.src) {
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                }
+                observer.unobserve(img);
+            }
+        });
+    });
+
+    document.querySelectorAll('img[data-src]').forEach(img => {
+        imageObserver.observe(img);
+    });
+}
